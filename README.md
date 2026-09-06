@@ -1,25 +1,58 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# VibeFashion
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+VibeFashion is a full-stack Laravel ecommerce website for discovering and buying eyewear, jewelry, and everyday fashion accessories. The store is designed around a clean shopping experience: customers can browse products by category, search the catalog, add items to a session-based cart, complete checkout, and manage their account details.
 
-## VibeFashion
+The project also includes a protected administration area where authorized staff can manage the product catalog, review customers, and monitor recent orders.
 
-VibeFashion is a full-stack Laravel ecommerce storefront for eyewear, jewelry, and everyday accessories. It provides a polished customer shopping experience alongside a protected admin workspace for catalog management.
+## Store Categories
+
+VibeFashion organizes its catalog into these product categories:
+
+- Eyewear and sunglasses
+- Necklaces and pendants
+- Rings
+- Bracelets and cuffs
+- Earrings
+- Jewelry collections
+- Accessories such as protective cases and frame straps
+
+The seeded catalog includes product names, descriptions, prices, stock levels, category assignments, product images, and featured-product flags.
+
+## Customer Experience
+
+Customers can:
+
+- Browse all products or filter the catalog by category
+- Search products by name, category, or description
+- View detailed product information and availability
+- Add products to a shopping cart and adjust quantities
+- Submit checkout details and receive an order confirmation
+- Register, sign in, and edit their name, email, phone, and address
+- Receive clear validation and authentication error messages
+
+## Administration
+
+The admin dashboard is protected by authentication and role-based authorization. Administrators can:
+
+- Add new products with categories, prices, stock, descriptions, and images
+- Edit existing product information
+- Remove products from the catalog
+- View registered customers and order counts
+- Review recent orders and their statuses
+
+New accounts are customers by default. Specific administrator email addresses can be configured through the `ADMIN_EMAILS` environment variable. An email domain such as `@admin.com` does not grant administrator access by itself.
 
 ## Features
 
-- Product browsing, categories, search, and responsive pagination
+- Laravel ecommerce storefront with Blade views
+- Responsive product browsing, categories, search, and pagination
 - Session-based shopping cart and checkout flow
-- Customer registration, login, profile editing, and order history support
-- Admin-only dashboard for products, customers, and recent orders
+- Customer authentication and profile editing
+- Admin-only dashboard and product management
 - Environment-configured admin email allowlist
-- Validation feedback and password visibility controls
-- SQLite development database with Laravel migrations and seed data
+- Server-side validation with visible form error messages
+- Password visibility controls on authentication forms
+- SQLite development database with migrations and seed data
 - Docker image based on PHP 8.4 and Apache
 
 ## Technology
@@ -62,13 +95,59 @@ cp .env.example .env
 
 Open `http://127.0.0.1:8000` after the server starts.
 
-## Admin Access
+## Admin Access Configuration
 
-Public registration creates customer accounts by default. To allow specific email addresses to register as administrators, add them to `.env`:
+To allow specific email addresses to register as administrators, add them to `.env`:
 
 ```env
 ADMIN_EMAILS=admin@example.com,manager@example.com
-	vibefashion
+```
+
+Then clear cached configuration:
+
+```bash
+php artisan config:clear
+```
+
+New registrations using those exact email addresses receive the `admin` role and can open `/admin`.
+
+For optional seeded admin credentials, set these values before running the seeder:
+
+```env
+ADMIN_SEED_EMAIL=admin@example.com
+ADMIN_SEED_PASSWORD=replace-with-a-strong-password
+```
+
+Never commit `.env` or real passwords.
+
+## Docker
+
+### Build the image
+
+```bash
+docker build -t vibefashion .
+```
+
+### Run the application
+
+Generate an application key once:
+
+```bash
+php artisan key:generate --show
+```
+
+Start the container with the generated key and a persistent SQLite volume:
+
+```bash
+docker run -d --name vibefashion -p 8080:80 \
+  -e APP_ENV=production \
+  -e APP_DEBUG=false \
+  -e APP_KEY=base64:replace-with-generated-key \
+  -e DB_CONNECTION=sqlite \
+  -e DB_DATABASE=/data/database.sqlite \
+  -e ADMIN_EMAILS=admin@example.com \
+  -v vibefashion-data:/data \
+  vibefashion
 ```
 
 Open `http://127.0.0.1:8080` in a browser. The container runs migrations automatically on startup.
@@ -105,59 +184,11 @@ app/                Application controllers, models, middleware, and mail
 database/           Migrations, factories, and seeders
 public/assets/      Storefront images, stylesheets, scripts, and fonts
 resources/views/    Blade pages and layouts
-routes/              Web and console routes
-tests/               PHPUnit feature and unit tests
-Dockerfile           PHP 8.4 Apache container definition
+routes/             Web and console routes
+tests/              PHPUnit feature and unit tests
+Dockerfile          PHP 8.4 Apache container definition
 ```
 
 ## License
 
 This project is released under the MIT License.
-
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
-
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
-
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
-```
-
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
