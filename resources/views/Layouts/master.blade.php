@@ -103,7 +103,7 @@
                                     </ul>
                                 </li>
                                 @auth
-                                <li><a href="{{ route('profile') }}">{{ auth()->user()->name }}</a></li>
+                                <li><a href="{{ auth()->user()->role === 'admin' ? route('admin.dashboard') : route('profile') }}">{{ auth()->user()->name }}</a></li>
                                 <li>
                                     <form method="POST" action="{{ route('logout') }}" class="nav-logout-form">
                                         @csrf

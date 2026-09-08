@@ -14,9 +14,11 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-progress
+RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-progress --no-scripts
 
 COPY . .
+
+RUN composer dump-autoload --no-dev --no-interaction --optimize
 
 RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache database \
     && touch database/database.sqlite \

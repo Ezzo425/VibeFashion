@@ -25,8 +25,7 @@ class AuthController extends Controller
             'address' => ['required', 'string', 'max:500'],
             'password' => ['required', 'confirmed', 'min:8'],
         ]);
-        $data['email'] = strtolower($data['email']);
-        $data['role'] = in_array($data['email'], config('auth.admin_emails'), true)
+        $data['role'] = in_array(strtolower($data['email']), config('auth.admin_emails'), true)
             ? 'admin'
             : 'customer';
 
@@ -56,8 +55,6 @@ class AuthController extends Controller
             'phone' => ['required', 'string', 'max:30'],
             'address' => ['required', 'string', 'max:500'],
         ]);
-        $data['email'] = strtolower($data['email']);
-
         $user->update($data);
 
         return back()->with('success', 'Your profile has been updated.');
@@ -70,10 +67,19 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
+        $user = User::query()
+            ->whereRaw('LOWER(email) = ?', [strtolower($credentials['email'])])
+            ->first();
+
+        if (! $user || ! Auth::validate(['email' => $user->email, 'password' => $credentials['password']])) {
             return back()->withErrors(['email' => 'The email or password is incorrect.'])->onlyInput('email');
         }
 
+        if (in_array(strtolower($user->email), config('auth.admin_emails'), true) && $user->role !== 'admin') {
+            $user->update(['role' => 'admin']);
+        }
+
+        Auth::login($user, $request->boolean('remember'));
         $request->session()->regenerate();
 
         return redirect()->intended(route('home'));
